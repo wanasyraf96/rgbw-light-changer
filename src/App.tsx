@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import mqtt, { MqttClient, IClientOptions, OnErrorCallback } from 'mqtt';
+import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -10,14 +11,29 @@ type Color = {
 }
 
 const defaultColor: Color = {
-  red:0,
-  green:0,
-  blue:0,
-  white:0
+  red: 0,
+  green: 0,
+  blue: 0,
+  white: 0
 }
+
+const mqtt_protocol = "ws"
+const mqtt_address = "svc.vectolabs.com"
+const mqtt_port = "8083"
+const mqttHostUrl: string = `${mqtt_protocol}://${mqtt_address}:${mqtt_port}/mqtt`
+
+const mqttOption: IClientOptions = {
+
+  protocolId: "MQTT",
+  protocolVersion: 5,
+  clientId: "react_light_" + Math.random().toString(16).substring(2,8)
+}
+
 function App() {
 
   const [color, setColor] = useState<Color>(defaultColor);
+  const [client, setClient] = useState<MqttClient | null>(null);
+  const [connectStatus, setConnectStatus] = useState("Connect")
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,7 +52,49 @@ function App() {
       toast.error("Please fill in all fields.");
       return;
     }
+    mqttConnect(mqttHostUrl, mqttOption); // Call mqttConnect only if client is not already set
   };
+
+
+
+  const mqttConnect = (host: string, mqttOption: IClientOptions) => {
+    setConnectStatus('Connecting');
+    setClient(mqtt.connect(host, mqttOption));
+  };
+  
+  useEffect(() => {
+    if (!client) {
+    }
+  
+    const handleConnect = () => {
+      setConnectStatus('Connected');
+    };
+  
+    const handleError = (err: OnErrorCallback | Error) => {
+      console.error('Connection error: ', err);
+      if (client) {
+        client.end();
+      }
+    };
+  
+    const handleReconnect = () => {
+      setConnectStatus('Reconnecting');
+    };
+  
+    if (client) {
+      client.on('connect', handleConnect);
+      client.on('error', handleError);
+      client.on('reconnect', handleReconnect);
+    }
+  
+    return () => {
+      if (client) {
+        client.removeListener('connect', handleConnect);
+        client.removeListener('error', handleError);
+        client.removeListener('reconnect', handleReconnect);
+      }
+    };
+  }, []); // Empty dependency array ensures this runs only once
 
   return (
     <>
