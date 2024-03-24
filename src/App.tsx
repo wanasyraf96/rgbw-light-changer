@@ -18,7 +18,7 @@ const defaultColor: Color = {
 }
 
 const mqtt_protocol = "ws"
-const mqtt_address = "svc.vectolabs.com"
+const mqtt_address = ""
 const mqtt_port = "8083"
 const mqttHostUrl: string = `${mqtt_protocol}://${mqtt_address}:${mqtt_port}/mqtt`
 
