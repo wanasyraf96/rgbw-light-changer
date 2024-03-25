@@ -1,4 +1,4 @@
-import mqtt, { MqttClient, IClientOptions, OnErrorCallback } from 'mqtt';
+import mqtt, { MqttClient, IClientOptions, OnErrorCallback, Client } from 'mqtt';
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,23 +17,23 @@ const defaultColor: Color = {
   white: 0
 }
 
-const mqtt_protocol = "ws"
-const mqtt_address = ""
-const mqtt_port = "8083"
+const mqtt_protocol = import.meta.env.VITE_MQTT_PROTOCOL
+const mqtt_address = import.meta.env.VITE_MQTT_ADDR
+const mqtt_port = import.meta.env.VITE_MQTT_PORT
 const mqttHostUrl: string = `${mqtt_protocol}://${mqtt_address}:${mqtt_port}/mqtt`
 
 const mqttOption: IClientOptions = {
 
   protocolId: "MQTT",
   protocolVersion: 5,
-  clientId: "react_light_" + Math.random().toString(16).substring(2,8)
+  clientId: "react_light_" + Math.random().toString(16).substring(2, 8)
 }
 
 function App() {
 
   const [color, setColor] = useState<Color>(defaultColor);
   const [client, setClient] = useState<MqttClient | null>(null);
-  const [connectStatus, setConnectStatus] = useState("Connect")
+  const [connectStatus, setConnectStatus] = useState<string>("Disconnected")
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,56 +45,61 @@ function App() {
     }));
   };
 
-  const handleSaveButtonClick = () => {
+  const handleSaveButtonClick = async () => {
     // Check if any field is empty
     if (Object.values(color).some(value => Number.isNaN(value))) {
       console.error(color)
       toast.error("Please fill in all fields.");
       return;
     }
-    mqttConnect(mqttHostUrl, mqttOption); // Call mqttConnect only if client is not already set
+    client?.publish("testtopic/#","test")
   };
 
 
 
-  const mqttConnect = (host: string, mqttOption: IClientOptions) => {
+  const mqttConnect = async (host: string, mqttOption: IClientOptions) => {
     setConnectStatus('Connecting');
-    setClient(mqtt.connect(host, mqttOption));
+    const newClient = await mqtt.connectAsync(host, mqttOption)
+    // const newClient = mqtt.connect(host, mqttOption)
+
+    newClient.on("connect", () => {
+      toast.info("Connecting to MQTT Broker...")
+      setClient(newClient)
+      setConnectStatus("Connected")
+    })
+
+    newClient.on("error", (error: Error) => {
+      setConnectStatus("Disconnected")
+      toast.error(error.message)
+    })
+
+    newClient.on("close", () => {
+      setConnectStatus("Disconnected")
+      toast.info("MQTT Connection closed")
+    })
+
+    newClient.on("offline", () => {
+      setConnectStatus("Disconnected")
+      toast.warning("MQTT Connection Offline")
+    })
   };
-  
+
   useEffect(() => {
-    if (!client) {
-    }
-  
-    const handleConnect = () => {
-      setConnectStatus('Connected');
-    };
-  
-    const handleError = (err: OnErrorCallback | Error) => {
-      console.error('Connection error: ', err);
-      if (client) {
-        client.end();
+    const initializeConnection = async () => {
+      if (!client) {
+        await mqttConnect(mqttHostUrl, mqttOption); // Call mqttConnect only if client is not already set
       }
     };
-  
-    const handleReconnect = () => {
-      setConnectStatus('Reconnecting');
-    };
-  
-    if (client) {
-      client.on('connect', handleConnect);
-      client.on('error', handleError);
-      client.on('reconnect', handleReconnect);
-    }
-  
+
+    initializeConnection();
+
+    // Cleanup function
     return () => {
       if (client) {
-        client.removeListener('connect', handleConnect);
-        client.removeListener('error', handleError);
-        client.removeListener('reconnect', handleReconnect);
+        client.end(); // Close the MQTT connection when the component unmounts
       }
     };
-  }, []); // Empty dependency array ensures this runs only once
+  }, [client]); // Dependency array ensures this effect runs when the 'client' state changes
 
   return (
     <>
