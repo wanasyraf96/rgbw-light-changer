@@ -4,10 +4,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 type Color = {
-  red: number
-  green: number
-  blue: number
-  white: number
+  red: number | string
+  green: number | string
+  blue: number | string
+  white: number | string
 }
 
 const defaultColor: Color = {
@@ -38,32 +38,37 @@ function App() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const parsedValue = Number.isNaN(value) ? NaN : parseInt(value, 10);
-    const clampedValue = Number.isNaN(parsedValue) ? NaN : Math.min(Math.max(parsedValue, 0), 255); // Clamp value between 0 and 255
+    const clampedValue = Number.isNaN(parsedValue) ? "" : Math.min(Math.max(parsedValue, 0), 255); // Clamp value between 0 and 255
     setColor(prevColor => ({
       ...prevColor,
       [name]: clampedValue,
     }));
   };
 
-  const handleSaveButtonClick = async () => {
+  const handleSaveButtonClick = () => {
     // Check if any field is empty
-    if (Object.values(color).some(value => Number.isNaN(value))) {
+    if (Object.values(color).some(value => (value === "" || Number.isNaN(value)))) {
       console.error(color)
       toast.error("Please fill in all fields.");
       return;
     }
-    client?.publish("testtopic/#","test")
+    if (connectStatus === "Disconnected") {
+      mqttConnect(mqttHostUrl, mqttOption)
+    }
+
+    client?.publish("testtopic/ok", JSON.stringify(color))
+    toast.info("Sending...")
   };
 
 
 
-  const mqttConnect = async (host: string, mqttOption: IClientOptions) => {
+  const mqttConnect = (host: string, mqttOption: IClientOptions) => {
     setConnectStatus('Connecting');
-    const newClient = await mqtt.connectAsync(host, mqttOption)
-    // const newClient = mqtt.connect(host, mqttOption)
+    // const newClient = await mqtt.connectAsync(host, mqttOption)
+    const newClient = mqtt.connect(host, mqttOption)
 
     newClient.on("connect", () => {
-      toast.info("Connecting to MQTT Broker...")
+      toast.success("Connected")
       setClient(newClient)
       setConnectStatus("Connected")
     })
@@ -75,7 +80,7 @@ function App() {
 
     newClient.on("close", () => {
       setConnectStatus("Disconnected")
-      toast.info("MQTT Connection closed")
+      toast.warning("MQTT Connection closed")
     })
 
     newClient.on("offline", () => {
@@ -85,9 +90,9 @@ function App() {
   };
 
   useEffect(() => {
-    const initializeConnection = async () => {
+    const initializeConnection = () => {
       if (!client) {
-        await mqttConnect(mqttHostUrl, mqttOption); // Call mqttConnect only if client is not already set
+        mqttConnect(mqttHostUrl, mqttOption); // Call mqttConnect only if client is not already set
       }
     };
 
@@ -172,7 +177,6 @@ function App() {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </>
   );
 }
