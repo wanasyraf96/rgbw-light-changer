@@ -116,7 +116,7 @@ const ColorPreview: React.FC<ColorPreviewProps> = ({ id, color, onPreviewChange 
         red = green = blue = 255
     }
 
-    const dropdownColor = colorPrefix.color
+    const dropdownColor = colorPrefix.solid
     return (
         <div className="container py-2 flex items-center justify-center">
             <div className="relative">
