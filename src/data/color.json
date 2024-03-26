@@ -1,0 +1,9 @@
+{
+  "color": [
+    
+    { "name": "RED", "value": [255, 0, 0, 255], "text": "text-white hover:bg-gray-200" },
+    { "name": "GREEN", "value": [0, 255, 0, 255], "text": "text-white hover:bg-gray-200" },
+    { "name": "BLUE", "value": [0, 0, 255, 255], "text": "text-white hover:bg-gray-200" },
+    { "name": "WHITE", "value": [255, 255, 255, 255], "text": "text-black hover:bg-gray-200"}
+  ]
+}
