@@ -106,6 +106,7 @@ const ColorPreview: React.FC<ColorPreviewProps> = ({ id, color, onPreviewChange 
             blue: color[2] as number,
             white: color[3] as number,
         })
+        toggleDropdown()
     }
 
     const white = (((color.white as number / 255) * 100) * (1 / 100)).toFixed(2)

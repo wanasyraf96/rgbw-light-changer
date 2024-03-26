@@ -1,8 +1,8 @@
-import mqtt, { MqttClient, IClientOptions, OnErrorCallback, Client } from 'mqtt';
-import React, { useState, useEffect, LabelHTMLAttributes } from 'react';
+import mqtt, { MqttClient, IClientOptions } from 'mqtt';
+import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import LightComponent, { Color, Light } from './Light';
+import { Color, Light } from './Light';
 import Lights from './Light';
 
 const defaultColor: Color = {
@@ -87,11 +87,6 @@ function App() {
         toast.error(error.message)
       })
 
-      // newClient.on("close", () => {
-      //   setConnectStatus("Disconnected")
-      //   toast.warning("MQTT Connection closed")
-      // })
-
       newClient.on("offline", () => {
         setConnectStatus("Disconnected")
         toast.warning("MQTT Connection Offline")
@@ -125,11 +120,11 @@ function App() {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen md:mt-16 sm:mt-32">
+      <div className="flex items-center justify-center min-h-screen md:mt-4">
         <div className="container max-w-md mx-4 flex flex-col">
           <Lights lights={lights} setLights={setLights} switchLight={handleSwitchOff} />
           <div className="flex flex-col flex-grow py-4">
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center">
               <div>
                 <button
                   className="bg-blue-800 hover:bg-blue-700 text-slate-200 py-2 px-6 rounded"
