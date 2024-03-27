@@ -104,13 +104,14 @@ function App() {
       await mqttConnect(mqttHostUrl, mqttOption)
     }
 
+    toast.info("Sending...")
     if (connectStatus === "Connected") {
-      const payload: LightPayload[] = lights.
+      lights.
         filter(({ value }) => value). //filter enabled light
-        map(({ id, color }) => ({ id, color })) // extract only id and color property
+        map(({ id, color }) => {
+          client?.publish("vl/dmx/wawasan/rx", JSON.stringify(`${id},${color.red.toString(16)},${color.green.toString(16)},${color.blue.toString(16)},${color.white.toString(16)}`))
+        }) // extract only id and color property
 
-      client?.publish("lampu", JSON.stringify(payload))
-      toast.info("Sending...")
     }
   };
 
@@ -120,11 +121,16 @@ function App() {
       await mqttConnect(mqttHostUrl, mqttOption)
     }
     if (switchState === true) {
-      client?.publish("off", JSON.stringify(id))
+      client?.publish("vl/dmx/wawasan/rx", JSON.stringify(`${id},${0},${0},${0},${0}`))
       toast.info("Switching light off...")
     } else {
-      client?.publish("on", JSON.stringify(id))
-      toast.info("Switching light on...")
+      const light = lights.filter(({ id: light_id, value }) => light_id === id && value)
+      console.log(light.length)
+      if (light.length === 1) {
+        client?.publish("vl/dmx/wawasan/rx", JSON.stringify(`${id},${light[0].color.red.toString(16)},${light[0].color.green.toString(16)},${light[0].color.blue.toString(16)},${light[0].color.white.toString(16)}`))
+        toast.info("Switching light on...")
+      }
+
     }
     return
   }
