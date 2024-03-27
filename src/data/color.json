@@ -103,92 +103,92 @@
   ],
   "dim": [
     {
-      "name": "Blue",
+      "name": "Blue_Dim",
       "value": [0, 0, 255],
       "text": "text-black hover:bg-blue-200"
     },
     {
-      "name": "Red",
+      "name": "Red_Dim",
       "value": [255, 0, 0],
       "text": "text-white hover:bg-gray-200"
     },
     {
-      "name": "Green",
+      "name": "Green_Dim",
       "value": [0, 255, 0],
       "text": "text-black hover:bg-green-200"
     },
     {
-      "name": "White",
+      "name": "White_Dim",
       "value": [255, 255, 255],
       "text": "text-black hover:bg-white"
     },
     {
-      "name": "Chocolate",
+      "name": "Chocolate_Dim",
       "value": [210, 105, 30],
       "text": "text-black hover:bg-chocolate-200"
     },
     {
-      "name": "Cyan",
+      "name": "Cyan_Dim",
       "value": [0, 255, 255],
       "text": "text-black hover:bg-cyan-200"
     },
     {
-      "name": "DarkTurquoise",
+      "name": "DarkTurquoise_Dim",
       "value": [0, 206, 209],
       "text": "text-black hover:bg-turquoise-200"
     },
     {
-      "name": "GoldenRod",
+      "name": "GoldenRod_Dim",
       "value": [218, 165, 32],
       "text": "text-black hover:bg-goldenrod-200"
     },
     {
-      "name": "MediumAquamarine",
+      "name": "MediumAquamarine_Dim",
       "value": [102, 205, 170],
       "text": "text-black hover:bg-aquamarine-200"
     },
     {
-      "name": "Orange",
+      "name": "Orange_Dim",
       "value": [255, 140, 0],
       "text": "text-black hover:bg-orange-200"
     },
     {
-      "name": "Peru",
+      "name": "Peru_Dim",
       "value": [205, 133, 63],
       "text": "text-black hover:bg-peru-200"
     },
     {
-      "name": "Pink",
+      "name": "Pink_Dim",
       "value": [255, 192, 203],
       "text": "text-black hover:bg-pink-200"
     },
     {
-      "name": "Purple",
+      "name": "Purple_Dim",
       "value": [255, 0, 255],
       "text": "text-black hover:bg-purple-200"
     },
     {
-      "name": "RoyalBlue",
+      "name": "RoyalBlue_Dim",
       "value": [65, 105, 225],
       "text": "text-black hover:bg-royalblue-200"
     },
     {
-      "name": "SandyBrown",
+      "name": "SandyBrown_Dim",
       "value": [244, 164, 96],
       "text": "text-black hover:bg-sandybrown-200"
     },
     {
-      "name": "SkyBlue",
+      "name": "SkyBlue_Dim",
       "value": [135, 206, 235],
       "text": "text-black hover:bg-skyblue-200"
     },
     {
-      "name": "SpringGreen",
+      "name": "SpringGreen_Dim",
       "value": [0, 255, 127],
       "text": "text-black hover:bg-springgreen-200"
     },
     {
-      "name": "Yellow",
+      "name": "Yellow_Dim",
       "value": [255, 255, 0],
       "text": "text-black hover:bg-yellow-200"
     }

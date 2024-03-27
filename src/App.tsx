@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Color, Light } from './Light';
 import Lights from './Light';
 import dataColor from "./data/color.json"
+import Loading from './Loading';
 
 const defaultColor: Color = {
   red: 0,
@@ -36,7 +37,7 @@ function App() {
   const [isDimming, setIsDimming] = useState<boolean>(false)
   const [client, setClient] = useState<MqttClient | null>(null);
   const [connectStatus, setConnectStatus] = useState<string>("Disconnected")
-  
+
   const [lights, setLights] = useState<Light[]>([
     { id: 1, label: "Light 1", switch: true, value: true, color: defaultColor },
     { id: 2, label: "Light 2", switch: true, value: true, color: defaultColor },
@@ -63,9 +64,27 @@ function App() {
     return () => clearInterval(id);
   }, [brightness, isDimming]);
 
-  const handleSelectDimColor = (colorName: string) => {
+  const [loading, setLoading] = useState(false)
+  const handleSelectDimColor = async (colorName: string) => {
     setSelectedColor(colorName);
     setIsFocused(true);
+
+
+    if (connectStatus === "Disconnected") {
+      setConnectStatus('Connecting');
+      await mqttConnect(mqttHostUrl, mqttOption)
+    }
+
+    if (connectStatus === "Connected") {
+      client?.publish("vl/dmx/wawasan/rx", colorName)
+      toast.info(`${colorName} selected...`)
+      setSelectedColor(colorName)
+    }
+
+    setLoading(() => true)
+    setTimeout(() => {
+      setLoading(() => false)
+    }, 40 * 1000);
 
   };
 
@@ -178,7 +197,7 @@ function App() {
   }
 
   return (
-    <>
+    <>{loading && <Loading loading={loading} />}
       <div className="flex items-center justify-center min-h-screen md:mt-4">
         <div className="container max-w-md my-4 flex flex-col">
           <div className="flex w-full justify-between mx-auto top">
