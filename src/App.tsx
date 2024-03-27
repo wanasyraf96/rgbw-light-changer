@@ -28,17 +28,50 @@ type LightPayload = Omit<Light, "label" | "value" | "switch">
 
 function App() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
-  const colors = dataColor.solid
+  const colors = dataColor
   const [activeTab, setActiveTab] = useState<string>("default")
-  const [color, _] = useState<Color>(defaultColor);
+  const [color,] = useState<Color>(defaultColor);
+  const [brightness, setBrightness] = useState<number>(100)
+  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [isDimming, setIsDimming] = useState<boolean>(false)
   const [client, setClient] = useState<MqttClient | null>(null);
   const [connectStatus, setConnectStatus] = useState<string>("Disconnected")
+  
   const [lights, setLights] = useState<Light[]>([
     { id: 1, label: "Light 1", switch: true, value: true, color: defaultColor },
     { id: 2, label: "Light 2", switch: true, value: true, color: defaultColor },
     { id: 3, label: "Light 3", switch: true, value: true, color: defaultColor },
     { id: 4, label: "Light 4", switch: true, value: true, color: defaultColor },
   ]);
+
+  // const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (brightness >= 100) {
+        setIsDimming(() => true)
+      } else if (brightness <= 0) {
+        setIsDimming(() => false)
+      }
+
+      // Increasing brightness from 0 to 100 in 20 seconds
+      if (isDimming) {
+        setBrightness((brightness) => brightness - 5);
+      } else {
+        setBrightness((brightness) => brightness + 5);
+      }
+    }, 200); // Change brightness every 1 second
+    return () => clearInterval(id);
+  }, [brightness, isDimming]);
+
+  const handleSelectDimColor = (colorName: string) => {
+    setSelectedColor(colorName);
+    setIsFocused(true);
+
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
 
   const handleSaveButtonClick = async () => {
     // Check if any field is empty
@@ -129,7 +162,7 @@ function App() {
   }
 
 
-  const handleSelectColor = async (name: string) => {
+  const handleSelectSolidColor = async (name: string) => {
 
     if (connectStatus === "Disconnected") {
       setConnectStatus('Connecting');
@@ -142,14 +175,6 @@ function App() {
       setSelectedColor(name)
     }
 
-  }
-
-  const DimTab = () => {
-    return (
-      <>
-        ddd
-      </>
-    )
   }
 
   return (
@@ -186,13 +211,13 @@ function App() {
             <>
               <div className="container py-2 flex items-center justify-between">
                 <div className="relative grid grid-cols-4 gap-4">
-                  {colors.map((color, index) => {
+                  {colors.solid.map((color, index) => {
                     return (
                       <div
                         key={index}
-                        className={` ${selectedColor === color.name? "": ""}w-16 h-16 rounded cursor-pointer text-center content-center ${color.text}`}
+                        className={`${isFocused && selectedColor === color.name ? 'ring-2 ring-blue-400' : ''} w-16 h-16 rounded cursor-pointer text-center content-center ${color.text}`}
                         style={{ backgroundColor: `rgba(${color.value.join(",")})` }}
-                        onClick={() => handleSelectColor(color.name)}
+                        onClick={() => handleSelectSolidColor(color.name)}
                       >{color.name}</div>
                     )
                   })}
@@ -201,7 +226,24 @@ function App() {
               </div>
             </>
           }
-          {activeTab === "dim" && <DimTab />}
+          {activeTab === "dim" && <>
+            <div className="container py-2 flex items-center justify-between">
+              <div className="relative grid grid-cols-4 gap-4">
+                {colors.dim.map((color, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className={`${isFocused && selectedColor === color.name ? 'ring-2 ring-blue-400' : ''} w-16 h-16 rounded cursor-pointer text-center content-center border ${color.text}`}
+                      style={{ backgroundColor: `rgba(${color.value.join(",")}, ${brightness / 100})` }}
+                      onClick={() => handleSelectDimColor(color.name)}
+                      onBlur={handleBlur}
+                      tabIndex={0}
+                    ></div>
+                  )
+                })}
+              </div>
+            </div>
+          </>}
         </div>
       </div>
     </>

@@ -1,6 +1,11 @@
 {
   "solid": [
     {
+      "name": "Clear",
+      "value": [0, 0, 0, 0],
+      "text": "text-black hover:bg-white"
+    },
+    {
       "name": "Blue",
       "value": [0, 0, 255, 255],
       "text": "text-black hover:bg-blue-200"
@@ -17,7 +22,7 @@
     },
     {
       "name": "White",
-      "value": [0, 0, 0, 255],
+      "value": [255, 255, 255, 255],
       "text": "text-black hover:bg-white"
     },
     {
@@ -93,6 +98,98 @@
     {
       "name": "Yellow",
       "value": [255, 255, 0, 255],
+      "text": "text-black hover:bg-yellow-200"
+    }
+  ],
+  "dim": [
+    {
+      "name": "Blue",
+      "value": [0, 0, 255],
+      "text": "text-black hover:bg-blue-200"
+    },
+    {
+      "name": "Red",
+      "value": [255, 0, 0],
+      "text": "text-white hover:bg-gray-200"
+    },
+    {
+      "name": "Green",
+      "value": [0, 255, 0],
+      "text": "text-black hover:bg-green-200"
+    },
+    {
+      "name": "White",
+      "value": [255, 255, 255],
+      "text": "text-black hover:bg-white"
+    },
+    {
+      "name": "Chocolate",
+      "value": [210, 105, 30],
+      "text": "text-black hover:bg-chocolate-200"
+    },
+    {
+      "name": "Cyan",
+      "value": [0, 255, 255],
+      "text": "text-black hover:bg-cyan-200"
+    },
+    {
+      "name": "DarkTurquoise",
+      "value": [0, 206, 209],
+      "text": "text-black hover:bg-turquoise-200"
+    },
+    {
+      "name": "GoldenRod",
+      "value": [218, 165, 32],
+      "text": "text-black hover:bg-goldenrod-200"
+    },
+    {
+      "name": "MediumAquamarine",
+      "value": [102, 205, 170],
+      "text": "text-black hover:bg-aquamarine-200"
+    },
+    {
+      "name": "Orange",
+      "value": [255, 140, 0],
+      "text": "text-black hover:bg-orange-200"
+    },
+    {
+      "name": "Peru",
+      "value": [205, 133, 63],
+      "text": "text-black hover:bg-peru-200"
+    },
+    {
+      "name": "Pink",
+      "value": [255, 192, 203],
+      "text": "text-black hover:bg-pink-200"
+    },
+    {
+      "name": "Purple",
+      "value": [255, 0, 255],
+      "text": "text-black hover:bg-purple-200"
+    },
+    {
+      "name": "RoyalBlue",
+      "value": [65, 105, 225],
+      "text": "text-black hover:bg-royalblue-200"
+    },
+    {
+      "name": "SandyBrown",
+      "value": [244, 164, 96],
+      "text": "text-black hover:bg-sandybrown-200"
+    },
+    {
+      "name": "SkyBlue",
+      "value": [135, 206, 235],
+      "text": "text-black hover:bg-skyblue-200"
+    },
+    {
+      "name": "SpringGreen",
+      "value": [0, 255, 127],
+      "text": "text-black hover:bg-springgreen-200"
+    },
+    {
+      "name": "Yellow",
+      "value": [255, 255, 0],
       "text": "text-black hover:bg-yellow-200"
     }
   ]
