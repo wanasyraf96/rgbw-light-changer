@@ -1,4 +1,3 @@
-import mqtt, { MqttClient, IClientOptions } from 'mqtt';
 import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,18 +13,34 @@ const defaultColor: Color = {
   white: 255
 }
 
-const mqtt_protocol = import.meta.env.VITE_MQTT_PROTOCOL
-const mqtt_address = import.meta.env.VITE_MQTT_ADDR
-const mqtt_port = import.meta.env.VITE_MQTT_PORT
-const mqttHostUrl: string = `${mqtt_protocol}://${mqtt_address}:${mqtt_port}/mqtt`
+const sendRequest = async (payload: string, showToast: boolean) => {
+  fetch(`${import.meta.env.VITE_MQTT_ADDR}`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({ "topic": import.meta.env.VITE_MQTT_DMX_PUBLISH_TOPIC, "payload": payload })
+  }).then(res => {
+    if (res.ok) {
+      return res.text()
+    }
+    throw new Error("request failed");
+  }).then((text) => {
+    console.log(text)
+    if (showToast) {
+      toast.info(`${payload} selected...`)
+    }
 
-const mqttOption: IClientOptions = {
-  protocolId: "MQTT",
-  protocolVersion: 5,
-  clientId: "react_light_" + Math.random().toString(16).substring(2, 8)
+  }).catch((error) => {
+    if (showToast) {
+      toast.error("Request failed")
+    }
+    console.error(error)
+  }).finally(() => {
+    console.log("light request finished")
+  })
 }
-
-type LightPayload = Omit<Light, "label" | "value" | "switch">
 
 function App() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
@@ -35,8 +50,6 @@ function App() {
   const [brightness, setBrightness] = useState<number>(100)
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const [isDimming, setIsDimming] = useState<boolean>(false)
-  const [client, setClient] = useState<MqttClient | null>(null);
-  const [connectStatus, setConnectStatus] = useState<string>("Disconnected")
 
   const [lights, setLights] = useState<Light[]>([
     { id: 1, label: "Light 1", switch: true, value: true, color: defaultColor },
@@ -69,17 +82,7 @@ function App() {
     setSelectedColor(colorName);
     setIsFocused(true);
 
-
-    if (connectStatus === "Disconnected") {
-      setConnectStatus('Connecting');
-      await mqttConnect(mqttHostUrl, mqttOption)
-    }
-
-    if (connectStatus === "Connected") {
-      client?.publish("vl/dmx/wawasan/rx", colorName)
-      toast.info(`${colorName} selected...`)
-      setSelectedColor(colorName)
-    }
+    await sendRequest(colorName, false)
 
     setLoading(() => true)
     setTimeout(() => {
@@ -99,107 +102,34 @@ function App() {
       toast.error("Please fill in all fields.");
       return;
     }
-    if (connectStatus === "Disconnected") {
-      setConnectStatus('Connecting');
-      await mqttConnect(mqttHostUrl, mqttOption)
-    }
+    const promises = lights.
+      filter(({ value }) => value). //filter enabled light
+      map(({ id, color }) => {
+        sendRequest(`${id},${color.red.toString(16)},${color.green.toString(16)},${color.blue.toString(16)},${color.white.toString(16)}`, true)
+      }) // extract only id and color property
 
-    toast.info("Sending...")
-    if (connectStatus === "Connected") {
-      lights.
-        filter(({ value }) => value). //filter enabled light
-        map(({ id, color }) => {
-          client?.publish("vl/dmx/wawasan/rx", JSON.stringify(`${id},${color.red.toString(16)},${color.green.toString(16)},${color.blue.toString(16)},${color.white.toString(16)}`))
-        }) // extract only id and color property
-
-    }
+    await Promise.allSettled(promises)
   };
 
   const handleSwitchOff = async (id: number, switchState: boolean) => {
-    if (connectStatus === "Disconnected") {
-      setConnectStatus('Connecting');
-      await mqttConnect(mqttHostUrl, mqttOption)
-    }
     if (switchState === true) {
-      client?.publish("vl/dmx/wawasan/rx", JSON.stringify(`${id},${0},${0},${0},${0}`))
+      sendRequest(`${id},${0},${0},${0},${0}`, false)
       toast.info("Switching light off...")
     } else {
       const light = lights.filter(({ id: light_id, value }) => light_id === id && value)
-      console.log(light.length)
       if (light.length === 1) {
-        client?.publish("vl/dmx/wawasan/rx", JSON.stringify(`${id},${light[0].color.red.toString(16)},${light[0].color.green.toString(16)},${light[0].color.blue.toString(16)},${light[0].color.white.toString(16)}`))
+        sendRequest(`${id},${light[0].color.red.toString(16)},${light[0].color.green.toString(16)},${light[0].color.blue.toString(16)},${light[0].color.white.toString(16)}`, false)
         toast.info("Switching light on...")
       }
-
     }
     return
   }
-
-
-
-  const mqttConnect = async (host: string, mqttOption: IClientOptions) => {
-    // const newClient = await mqtt.connect(host, mqttOption)
-    if (!client) {
-      const newClient = await mqtt.connectAsync(host, mqttOption)
-
-      newClient.on("error", (error: Error) => {
-        setConnectStatus("Disconnected")
-        toast.error(error.message)
-      })
-
-      newClient.on("offline", () => {
-        if (connectStatus === "Disconnected") {
-          toast.warning("MQTT Connection Offline")
-        }
-        setConnectStatus("Disconnected")
-      })
-
-      newClient.on("connect", () => {
-        if (connectStatus !== "Connected") {
-          toast.success("Connected")
-        }
-        setClient(newClient)
-        setConnectStatus("Connected")
-      })
-    }
-  };
-
-  useEffect(() => {
-    const initializeConnection = async () => {
-      if (!client || connectStatus !== "Connected") {
-        setConnectStatus('Connecting');
-        await mqttConnect(mqttHostUrl, mqttOption); // Call mqttConnect only if client is not already set
-      }
-    };
-
-    initializeConnection();
-
-    // Cleanup function
-    return () => {
-      if (client) {
-        client.end(); // Close the MQTT connection when the component unmounts
-      }
-    };
-  }, [client]); // Dependency array ensures this effect runs when the 'client' state changes
-
   const handleChangeTab = (tab: string) => {
     setActiveTab(tab)
   }
-
-
   const handleSelectSolidColor = async (name: string) => {
-
-    if (connectStatus === "Disconnected") {
-      setConnectStatus('Connecting');
-      await mqttConnect(mqttHostUrl, mqttOption)
-    }
-
-    if (connectStatus === "Connected") {
-      client?.publish("vl/dmx/wawasan/rx", name)
-      toast.info(`${name} selected...`)
-      setSelectedColor(name)
-    }
-
+    setSelectedColor(name)
+    await sendRequest(name, true)
   }
 
   return (
