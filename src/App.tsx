@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Color, Light } from './Light';
+import { Color, Light, RGBColor } from './Light';
 import Lights from './Light';
 import dataColor from "./data/color.json"
 import Loading from './Loading';
@@ -10,7 +10,7 @@ const defaultColor: Color = {
   red: 0,
   green: 0,
   blue: 0,
-  white: 255
+  white: 0
 }
 
 const sendRequest = async (payload: string, showToast: boolean) => {
@@ -105,7 +105,13 @@ function App() {
     const promises = lights.
       filter(({ value }) => value). //filter enabled light
       map(({ id, color }) => {
-        sendRequest(`${id},${color.red.toString(16)},${color.green.toString(16)},${color.blue.toString(16)},${color.white.toString(16)}`, true)
+        sendRequest(`"${id},${color.red},${color.green},${color.blue},${color.white}"`, true)
+        const rgb: RGBColor = { red: color.red, green: color.green, blue: color.blue }
+        if (Object.values(rgb).every(value => value === 255)) {
+          sendRequest(`"${id},${0},${0},${0},${255}"`, false)
+        } else {
+          sendRequest(`"${id},${rgb.red},${rgb.green},${rgb.blue},${0}"`, false)
+        }
       }) // extract only id and color property
 
     await Promise.allSettled(promises)
@@ -113,12 +119,17 @@ function App() {
 
   const handleSwitchOff = async (id: number, switchState: boolean) => {
     if (switchState === true) {
-      sendRequest(`${id},${0},${0},${0},${0}`, false)
+      sendRequest(`"${id},${0},${0},${0},${0}"`, false)
       toast.info("Switching light off...")
     } else {
       const light = lights.filter(({ id: light_id, value }) => light_id === id && value)
       if (light.length === 1) {
-        sendRequest(`${id},${light[0].color.red.toString(16)},${light[0].color.green.toString(16)},${light[0].color.blue.toString(16)},${light[0].color.white.toString(16)}`, false)
+        const rgb: RGBColor = { red: color.red, green: color.green, blue: color.blue }
+        if (Object.values(rgb).every(value => value === 255)) {
+          sendRequest(`"${id},${0},${0},${0},${255}"`, false)
+        } else {
+          sendRequest(`"${id},${light[0].color.red},${light[0].color.green},${light[0].color.blue},${0}"`, false)
+        }
         toast.info("Switching light on...")
       }
     }

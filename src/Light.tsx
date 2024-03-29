@@ -70,10 +70,14 @@ const LightComponent: React.FC<LightComponentProps> = ({ light, onToggle, onTogg
                             <label htmlFor="blue" className="capitalize ">blue</label>
                             <input type="number" className="w-14 h-8 rounded text-center" min={0} max={255} value={light.color.blue} onChange={(e) => handleColorChange(e, "blue")} />
                         </div>
-                        <div className="flex flex-col flex-auto items-center">
+                        {/* <div className="flex flex-col flex-auto items-center">
                             <label htmlFor="white" className="capitalize ">white</label>
                             <input type="number" className="w-14 h-8 rounded text-center" min={0} max={255} value={light.color.white} onChange={(e) => handleColorChange(e, "white")} />
-                        </div>
+                        </div> */}
+                        {/* <div className="flex flex-col flex-auto items-center">
+                            <label htmlFor="white" className="capitalize ">white</label>
+                            <input type="range" className="w-14 h-8 rounded text-center" min={0} max={255} step={1} value={light.color.white} onChange={(e) => handleColorChange(e, "white")} />
+                        </div> */}
                     </div>
                 </div>
             </div>
@@ -87,7 +91,7 @@ interface ColorPreviewProps {
     onPreviewChange: (id: number, color: Color) => void
 }
 
-type RGBColor = Omit<Color, "white">
+export type RGBColor = Omit<Color, "white">
 
 const ColorPreview: React.FC<ColorPreviewProps> = ({ id, color, onPreviewChange }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -109,7 +113,7 @@ const ColorPreview: React.FC<ColorPreviewProps> = ({ id, color, onPreviewChange 
         toggleDropdown()
     }
 
-    const white = (((color.white as number / 255) * 100) * (1 / 100)).toFixed(2)
+    // const white = (1-((color.white as number / 255) * 100) * (1 / 100)).toFixed(2)
     const rgb: RGBColor = { red: color.red, green: color.green, blue: color.blue }
     let { red, green, blue } = color
     if (Object.values(rgb).every(value => value === 0)) {
@@ -122,7 +126,7 @@ const ColorPreview: React.FC<ColorPreviewProps> = ({ id, color, onPreviewChange 
             <div className="relative">
                 <div
                     className="w-24 h-8 rounded cursor-pointer"
-                    style={{ backgroundColor: `rgba(${red}, ${green}, ${blue}, ${white})` }}
+                    style={{ backgroundColor: `rgba(${red}, ${green}, ${blue})` }}
                     onClick={handleColorPreviewClick}
                 ></div>
                 {dropdownOpen && (
