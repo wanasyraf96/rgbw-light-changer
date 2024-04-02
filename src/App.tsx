@@ -105,7 +105,6 @@ function App() {
     const promises = lights.
       filter(({ value }) => value). //filter enabled light
       map(({ id, color }) => {
-        sendRequest(`"${id},${color.red},${color.green},${color.blue},${color.white}"`, true)
         const rgb: RGBColor = { red: color.red, green: color.green, blue: color.blue }
         if (Object.values(rgb).every(value => value === 255)) {
           sendRequest(`"${id},${0},${0},${0},${255}"`, false)
@@ -119,16 +118,16 @@ function App() {
 
   const handleSwitchOff = async (id: number, switchState: boolean) => {
     if (switchState === true) {
-      sendRequest(`"${id},${0},${0},${0},${0}"`, false)
+      await sendRequest(`"${id},${0},${0},${0},${0}"`, false)
       toast.info("Switching light off...")
     } else {
       const light = lights.filter(({ id: light_id, value }) => light_id === id && value)
       if (light.length === 1) {
         const rgb: RGBColor = { red: color.red, green: color.green, blue: color.blue }
         if (Object.values(rgb).every(value => value === 255)) {
-          sendRequest(`"${id},${0},${0},${0},${255}"`, false)
+          await sendRequest(`"${id},${0},${0},${0},${255}"`, false)
         } else {
-          sendRequest(`"${id},${light[0].color.red},${light[0].color.green},${light[0].color.blue},${0}"`, false)
+          await sendRequest(`"${id},${light[0].color.red},${light[0].color.green},${light[0].color.blue},${0}"`, false)
         }
         toast.info("Switching light on...")
       }
