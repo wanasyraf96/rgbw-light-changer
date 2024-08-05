@@ -77,17 +77,13 @@ function App() {
     return () => clearInterval(id);
   }, [brightness, isDimming]);
 
-  const [loading, setLoading] = useState(false)
+  const [loading, _] = useState(false)
   const handleSelectDimColor = async (colorName: string) => {
     setSelectedColor(colorName);
     setIsFocused(true);
 
     await sendRequest(colorName, false)
 
-    setLoading(() => true)
-    setTimeout(() => {
-      setLoading(() => false)
-    }, 40 * 1000);
 
   };
 
@@ -154,7 +150,7 @@ function App() {
               Preset
             </button>
             <button className={`px-4 py-2 rounded-t-lg ${activeTab === "dim" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"}`} onClick={() => handleChangeTab("dim")}>
-              Dim
+              Theme
             </button>
           </div>
           {activeTab === "default" &&
@@ -191,15 +187,44 @@ function App() {
               </div>
             </>
           }
+        {activeTab === "dim" && (
+          <div className="container py-2 flex items-center justify-between">
+            <div className="relative grid grid-cols-3 gap-12">
+              {colors.dim.map((color, index) => (
+                  color.name ? (
+                    <div
+                      key={index}
+                      className={`${isFocused && selectedColor === color.name ? 'ring-2 ring-blue-400' : ''} w-32 h-32 rounded-lg cursor-pointer text-center content-center flex items-center justify-center p-3 transition-transform transform hover:scale-105 shadow-lg`}
+                      onClick={() => handleSelectDimColor(color.value)}
+                      onBlur={handleBlur}
+                      tabIndex={0}
+                      style={{ 
+                        background: `${color.background || 'linear-gradient(135deg, #f5f5f5, #e0e0e0)'}`, 
+                        wordBreak: 'break-word', 
+                        whiteSpace: 'normal',
+                        transition: 'background 0.3s ease-in-out',
+                        
+                      }}
+                    >
+                      <span className="text-sm font-bold text-center leading-tight">{color.name}</span>
+                    </div>
+                  ) : null
+              ))}
+    </div>
+  </div>
+)}
+
+
+
+
+
+
           {activeTab === "dim" && <>
-            <div className="container py-2 flex items-center justify-between">
               <div className="relative grid grid-cols-4 gap-4">
                 {colors.dim.map((color, index) => {
                   return (
                     <div
                       key={index}
-                      className={`${isFocused && selectedColor === color.name ? 'ring-2 ring-blue-400' : ''} w-16 h-16 rounded cursor-pointer text-center content-center border ${color.text}`}
-                      style={{ backgroundColor: `rgba(${color.value.join(",")}, ${brightness / 100})` }}
                       onClick={() => handleSelectDimColor(color.name)}
                       onBlur={handleBlur}
                       tabIndex={0}
@@ -207,7 +232,6 @@ function App() {
                   )
                 })}
               </div>
-            </div>
           </>}
         </div>
       </div>
