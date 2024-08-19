@@ -149,7 +149,7 @@ function App() {
             <button className={`px-4 py-2 rounded-t-lg ${activeTab === "preset" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"}`} onClick={() => handleChangeTab("preset")}>
               Preset
             </button>
-            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "dim" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"} ${import.meta.env.ENABLE_THEMME === 'true' ? 'cursor-pointer' : 'cursor-not-allowed'} `} onClick={() => { import.meta.env.ENABLE_THEME === 'true' ? handleChangeTab("dim") : console.log("Theme is not enable") }}>
+            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "dim" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"} ${import.meta.env.VITE_ENABLE_THEMME === 'true' ? 'cursor-pointer' : 'cursor-not-allowed'} `} onClick={() => { import.meta.env.ENABLE_THEME === 'true' ? handleChangeTab("dim") : console.log("Theme is not enable") }}>
               Theme
             </button>
           </div>
