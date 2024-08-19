@@ -20,7 +20,7 @@ const sendRequest = async (payload: string, showToast: boolean) => {
       "Content-Type": "application/json",
       Accept: "application/json"
     },
-    body: JSON.stringify({ "topic": import.meta.env.VITE_MQTT_DMX_PUBLISH_TOPIC, "payload": payload })
+    body: JSON.stringify({ "topic": import.meta.env.VITE_MQTT_DMX_PUBLISH_TOPIC, "payload": `${payload}` })
   }).then(res => {
     if (res.ok) {
       return res.text()
@@ -149,7 +149,7 @@ function App() {
             <button className={`px-4 py-2 rounded-t-lg ${activeTab === "preset" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"}`} onClick={() => handleChangeTab("preset")}>
               Preset
             </button>
-            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "dim" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"}`} onClick={() => handleChangeTab("dim")}>
+            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "dim" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"} ${import.meta.env.ENABLE_THEMME === 'true' ? 'cursor-pointer' : 'cursor-not-allowed'} `} onClick={() => { import.meta.env.ENABLE_THEME === 'true' ? handleChangeTab("dim") : console.log("Theme is not enable") }}>
               Theme
             </button>
           </div>
@@ -187,10 +187,10 @@ function App() {
               </div>
             </>
           }
-        {activeTab === "dim" && (
-          <div className="container py-2 flex items-center justify-between">
-            <div className="relative grid grid-cols-3 gap-12">
-              {colors.dim.map((color, index) => (
+          {activeTab === "dim" && (
+            <div className="container py-2 flex items-center justify-between">
+              <div className="relative grid grid-cols-3 gap-12">
+                {colors.dim.map((color, index) => (
                   color.name ? (
                     <div
                       key={index}
@@ -198,40 +198,34 @@ function App() {
                       onClick={() => handleSelectDimColor(color.value)}
                       onBlur={handleBlur}
                       tabIndex={0}
-                      style={{ 
-                        background: `${color.background || 'linear-gradient(135deg, #f5f5f5, #e0e0e0)'}`, 
-                        wordBreak: 'break-word', 
+                      style={{
+                        background: `${color.background || 'linear-gradient(135deg, #f5f5f5, #e0e0e0)'}`,
+                        wordBreak: 'break-word',
                         whiteSpace: 'normal',
                         transition: 'background 0.3s ease-in-out',
-                        
+
                       }}
                     >
                       <span className="text-sm font-bold text-center leading-tight">{color.name}</span>
                     </div>
                   ) : null
-              ))}
-    </div>
-  </div>
-)}
-
-
-
-
-
-
-          {activeTab === "dim" && <>
-              <div className="relative grid grid-cols-4 gap-4">
-                {colors.dim.map((color, index) => {
-                  return (
-                    <div
-                      key={index}
-                      onClick={() => handleSelectDimColor(color.name)}
-                      onBlur={handleBlur}
-                      tabIndex={0}
-                    ></div>
-                  )
-                })}
+                ))}
               </div>
+            </div>
+          )}
+          {activeTab === "dim" && <>
+            <div className="relative grid grid-cols-4 gap-4">
+              {colors.dim.map((color, index) => {
+                return (
+                  <div
+                    key={index}
+                    onClick={() => handleSelectDimColor(color.name)}
+                    onBlur={handleBlur}
+                    tabIndex={0}
+                  ></div>
+                )
+              })}
+            </div>
           </>}
         </div>
       </div>

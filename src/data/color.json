@@ -99,6 +99,11 @@
       "name": "Yellow",
       "value": [255, 255, 0, 255],
       "text": "text-black hover:bg-yellow-200"
+    },
+    {
+      "name": "WhiteAll",
+      "value": [255, 255, 255, 255],
+      "text": "text-black hover:bg-white"
     }
   ],
 
