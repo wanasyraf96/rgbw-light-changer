@@ -3,6 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Color, Light, RGBColor } from './Light';
 import Lights from './Light';
+import Lights2, { Light2 } from './Light2';
 import dataColor from "./data/color.json"
 import Loading from './Loading';
 
@@ -56,6 +57,10 @@ function App() {
     { id: 2, label: "Light 2", switch: true, value: true, color: defaultColor },
     { id: 3, label: "Light 3", switch: true, value: true, color: defaultColor },
     { id: 4, label: "Light 4", switch: true, value: true, color: defaultColor },
+  ]);
+
+  const [lights2, setLights2] = useState<Light2[]>([
+    { id: 1, label: `Light ${"id"}`, switch: true, value: true, color: defaultColor },
   ]);
 
   // const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
@@ -112,6 +117,27 @@ function App() {
     await Promise.allSettled(promises)
   };
 
+  const handleSaveButtonClick2 = async () => {
+    // Check if any field is empty
+    if (Object.values(color).some(value => (value === "" || Number.isNaN(value)))) {
+      console.error(color)
+      toast.error("Please fill in all fields.");
+      return;
+    }
+    const promises = lights2.
+      filter(({ value }) => value). //filter enabled light
+      map(({ id, color }) => {
+        const rgb: RGBColor = { red: color.red, green: color.green, blue: color.blue }
+        if (Object.values(rgb).every(value => value === 255)) {
+          sendRequest(`"${id},${0},${0},${0},${255}"`, false)
+        } else {
+          sendRequest(`"${id},${rgb.red},${rgb.green},${rgb.blue},${0}"`, false)
+        }
+      }) // extract only id and color property
+
+    await Promise.allSettled(promises)
+  };
+
   const handleSwitchOff = async (id: number, switchState: boolean) => {
     if (switchState === true) {
       await sendRequest(`"${id},${0},${0},${0},${0}"`, false)
@@ -151,6 +177,9 @@ function App() {
             </button>
             <button className={`px-4 py-2 rounded-t-lg ${activeTab === "dim" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"} ${import.meta.env.VITE_ENABLE_THEMME === 'true' ? 'cursor-pointer' : 'cursor-not-allowed'} `} onClick={() => { import.meta.env.ENABLE_THEME === 'true' ? handleChangeTab("dim") : console.log("Theme is not enable") }}>
               Theme
+            </button>
+            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "single" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"}`} onClick={() => handleChangeTab("single")}>
+              Single
             </button>
           </div>
           {activeTab === "default" &&
@@ -213,6 +242,21 @@ function App() {
               </div>
             </div>
           )}
+          {activeTab === "single" &&
+            <div className="mt-10">
+              <Lights2 lights={lights2} setLights={setLights2} switchLight={handleSwitchOff} />
+              <div className="flex flex-col flex-grow">
+                <div className="flex justify-center">
+                  <div>
+                    <button
+                      className="bg-blue-800 hover:bg-blue-700 text-slate-200 py-2 px-6 rounded"
+                      onClick={handleSaveButtonClick2}>Save</button>
+                    <ToastContainer autoClose={1000} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
           {activeTab === "dim" && <>
             <div className="relative grid grid-cols-4 gap-4">
               {colors.dim.map((color, index) => {
