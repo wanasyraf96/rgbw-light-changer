@@ -60,7 +60,7 @@ function App() {
   ]);
 
   const [lights2, setLights2] = useState<Light2[]>([
-    { id: 1, label: `Light ${"id"}`, switch: true, value: true, color: defaultColor },
+    { id: 1, label: `Light ${1}`, switch: true, value: true, color: defaultColor },
   ]);
 
   // const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
@@ -244,7 +244,7 @@ function App() {
           )}
           {activeTab === "single" &&
             <div className="mt-10">
-              <Lights2 lights={lights2} setLights={setLights2} switchLight={handleSwitchOff} />
+              <Lights2 lights2={lights2} setLights2={setLights2} switchLight2={handleSwitchOff} />
               <div className="flex flex-col flex-grow">
                 <div className="flex justify-center">
                   <div>

@@ -39,7 +39,6 @@ const LightComponent: React.FC<LightComponentProps> = ({ light, onToggle, onTogg
     const handleDefaultColorChange = (id: number, color: Color) => {
         onPreviewChange(id, color)
     }
-    
     return (
         <div className="flex items-center justify-between">
             <div className="p-2 flex flex-col border m-4 rounded w-full">
@@ -151,55 +150,45 @@ const ColorPreview: React.FC<ColorPreviewProps> = ({ id, color, onPreviewChange 
 };
 
 interface LightsProps {
-    lights: Light2[]
-    setLights: React.Dispatch<React.SetStateAction<Light2[]>>
-    switchLight: (id: number, switchState: boolean) => Promise<void>
+    lights2: Light2[]
+    setLights2: React.Dispatch<React.SetStateAction<Light2[]>>
+    switchLight2: (id: number, switchState: boolean) => Promise<void>
 }
 
 const defaultColor = { red: 0, green: 0, blue: 0, white: 0 };
 
-const Lights2: React.FC<LightsProps> = ({ lights, setLights, switchLight }) => {
+const Lights2: React.FC<LightsProps> = ({ lights2, setLights2, switchLight2 }) => {
   const [selectedId, setSelectedId] = useState<number>(1); // Dropdown-controlled Light ID
 
   const toggleLight = (id: number) => {
-    setLights((prevLights) =>
-      prevLights.map((light) =>
-        light.id === id ? { ...light, value: !light.value } : light
-      )
-    );
-  };
+    setLights2(prevLights => prevLights.map(light => light.id === id ? { ...light, value: !light.value } : light))
+  }
 
   const toggleLightSwitch = async (id: number) => {
-    setLights((prevLights) =>
-      prevLights.map((light) =>
-        light.id === id ? { ...light, switch: !light.switch } : light
-      )
-    );
-    const light = lights.find((light) => light.id === id);
-    if (light) {
-      await switchLight(id, !light.switch);
+    setLights2(prevLights => prevLights.map(light => light.id === id ? { ...light, switch: !light.switch } : light))
+    const light = lights2.filter(light => light.id === id)
+    if (light.length === 1) {
+        const { switch: switchState } = light[0]
+        await switchLight2(id, switchState)
     }
-  };
+  }
 
   const handleColorChange = (id: number, color: Color) => {
-    setLights((prevLights) =>
-      prevLights.map((light) => (light.id === id ? { ...light, color } : light))
-    );
-  };
+    setLights2(prevLights => prevLights.map(light => (light.id === id ? { ...light, color } : light)))
+  }
 
   const handlePreviewChange = (id: number, color: Color) => {
-    setLights((prevLights) =>
-      prevLights.map((light) => (light.id === id ? { ...light, color } : light))
-    );
-    return color;
-  };
+    setLights2(prevLights =>
+      prevLights.map(light2 => (light2.id === id ? { ...light2, color } : light2)))
+    return color
+  }
 
   const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = parseInt(e.target.value, 10);
     setSelectedId(id);
-    if (!lights.some((light) => light.id === id)) {
+    if (!lights2.some((light) => light.id === id)) {
       // Add new light to the list if not present
-      setLights((prevLights) => [
+      setLights2((prevLights) => [
         ...prevLights,
         { id, label: `Light ${id}`, switch: true, value: true, color: defaultColor },
       ]);
@@ -207,7 +196,7 @@ const Lights2: React.FC<LightsProps> = ({ lights, setLights, switchLight }) => {
   };
 
   // Get the light object corresponding to the selected ID
-  const selectedLight = lights.find((light) => light.id === selectedId);
+  const selectedLight = lights2.find((light) => light.id === selectedId);
 
   return (
     <div className="flex flex-col items-center">
