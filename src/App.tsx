@@ -139,22 +139,33 @@ function App() {
   };
 
   const handleSwitchOff = async (id: number, switchState: boolean) => {
-    if (switchState === true) {
-      await sendRequest(`"${id},${0},${0},${0},${0}"`, false)
-      toast.info("Switching light off...")
-    } else {
-      const light = lights.filter(({ id: light_id, value }) => light_id === id && value)
-      if (light.length === 1) {
-        const rgb: RGBColor = { red: color.red, green: color.green, blue: color.blue }
-        if (Object.values(rgb).every(value => value === 255)) {
-          await sendRequest(`"${id},${0},${0},${0},${255}"`, false)
-        } else {
-          await sendRequest(`"${id},${light[0].color.red},${light[0].color.green},${light[0].color.blue},${0}"`, false)
-        }
-        toast.info("Switching light on...")
-      }
+    let light;
+    
+    if (activeTab === "default") {
+      // Handle lights from the 'default' tab
+      light = lights.find(({ id: light_id }) => light_id === id);
+    } else if (activeTab === "single") {
+      // Handle lights from the 'single' tab
+      light = lights2.find(({ id: light_id }) => light_id === id);
     }
-    return
+  
+    if (!light) {
+      console.error(`Light with ID ${id} not found`);
+      return;
+    }
+  
+    if (switchState === true) {
+      await sendRequest(`"${id},${0},${0},${0},${0}"`, false);
+      toast.info("Switching light off...");
+    } else {
+      const rgb: RGBColor = { red: light.color.red, green: light.color.green, blue: light.color.blue };
+      if (Object.values(rgb).every(value => value === 255)) {
+        await sendRequest(`"${id},${0},${0},${0},${255}"`, false);
+      } else {
+        await sendRequest(`"${id},${rgb.red},${rgb.green},${rgb.blue},${0}"`, false);
+      }
+      toast.info("Switching light on...");
+    }
   }
   const handleChangeTab = (tab: string) => {
     setActiveTab(tab)
