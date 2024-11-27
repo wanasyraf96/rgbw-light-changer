@@ -186,8 +186,16 @@ const Lights2: React.FC<LightsProps> = ({ lights2, setLights2, switchLight2 }) =
   const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = parseInt(e.target.value, 10);
     setSelectedId(id);
+  
+    setLights2((prevLights) =>
+      prevLights.map((light) =>
+        light.id === id
+          ? { ...light, value: true } 
+          : { ...light, value: false }
+      )
+    );
+  
     if (!lights2.some((light) => light.id === id)) {
-      // Add new light to the list if not present
       setLights2((prevLights) => [
         ...prevLights,
         { id, label: `Light ${id}`, switch: true, value: true, color: defaultColor },
