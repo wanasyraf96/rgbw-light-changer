@@ -138,6 +138,10 @@ function App() {
     await Promise.allSettled(promises)
   };
 
+  const handleClearSingle = async () => {
+    await sendRequest(`Clear,0`, true)
+  }
+
   const handleSwitchOff = async (id: number, switchState: boolean) => {
     let light;
     
@@ -262,6 +266,7 @@ function App() {
                     <button
                       className="bg-blue-800 hover:bg-blue-700 text-slate-200 py-2 px-6 rounded"
                       onClick={handleSaveButtonClick2}>Save</button>
+                    <button className='bg-red-600 hover:bg-red-400 text-slate-200 py-2 px-6 rounded mx-2' onClick={handleClearSingle}>Clear</button>
                     <ToastContainer autoClose={1000} />
                   </div>
                 </div>
