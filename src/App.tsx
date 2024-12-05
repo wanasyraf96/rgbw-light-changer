@@ -46,7 +46,7 @@ const sendRequest = async (payload: string, showToast: boolean) => {
 function App() {
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
   const colors = dataColor
-  const [activeTab, setActiveTab] = useState<string>("default")
+  const [activeTab, setActiveTab] = useState<string>("single")
   const [color,] = useState<Color>(defaultColor);
   const [brightness, setBrightness] = useState<number>(100)
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -82,7 +82,7 @@ function App() {
     return () => clearInterval(id);
   }, [brightness, isDimming]);
 
-  const [loading, _] = useState(false)
+  const [loading] = useState(false)
   const handleSelectDimColor = async (colorName: string) => {
     setSelectedColor(colorName);
     setIsFocused(true);
@@ -180,17 +180,17 @@ function App() {
       <div className="flex items-center justify-center min-h-screen md:mt-4">
         <div className="container max-w-md my-4 flex flex-col">
           <div className="flex w-full justify-between mx-auto top">
-            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "default" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"}`} onClick={() => handleChangeTab("default")}>
-              Default
-            </button>
-            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "preset" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"}`} onClick={() => handleChangeTab("preset")}>
-              Preset
-            </button>
-            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "dim" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"} ${import.meta.env.VITE_ENABLE_THEMME === 'true' ? 'cursor-pointer' : 'cursor-not-allowed'} `} onClick={() => { import.meta.env.ENABLE_THEME === 'true' ? handleChangeTab("dim") : console.log("Theme is not enable") }}>
-              Theme
-            </button>
             <button className={`px-4 py-2 rounded-t-lg ${activeTab === "single" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"}`} onClick={() => handleChangeTab("single")}>
               Single
+            </button>
+            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "default" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"} ${import.meta.env.VITE_ENABLE_DEFAULT === 'true' ? 'cursor-pointer' : 'cursor-not-allowed'} `} onClick={() => { import.meta.env.VITE_ENABLE_DEFAULT === 'true' ? handleChangeTab("default") : console.log("Theme is not enable") }}>
+              Default
+            </button>
+            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "preset" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"} ${import.meta.env.VITE_ENABLE_PRESET === 'true' ? 'cursor-pointer' : 'cursor-not-allowed'} `} onClick={() => { import.meta.env.VITE_ENABLE_PRESET === 'true' ? handleChangeTab("preset") : console.log("Preset is not enable") }}>
+              Preset
+            </button>
+            <button className={`px-4 py-2 rounded-t-lg ${activeTab === "dim" ? "bg-blue-800 text-white" : "bg-gray-200 text-gray-800"} ${import.meta.env.VITE_ENABLE_THEME === 'true' ? 'cursor-pointer' : 'cursor-not-allowed'} `} onClick={() => { import.meta.env.VITE_ENABLE_THEME === 'true' ? handleChangeTab("dim") : console.log("Theme is not enable") }}>
+              Theme
             </button>
           </div>
           {activeTab === "default" &&
